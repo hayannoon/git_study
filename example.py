@@ -4,4 +4,4 @@ def greet(name):
 
 if __name__ == "__main__":
     greet("World")
-    greet("Minwoo")
+    greet("Minwoo").
