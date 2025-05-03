@@ -26,7 +26,7 @@ jobs:
       - name: Check Python syntax with flake8
         run: |
           flake8 .  # 현재 디렉토리의 Python 파일들에 대해 flake8 실행
-        continue-on-error: false  # 만약 flake8이 실패하면 이 워크플로는 실패로 간주됨
+        continue-on-error: false  # flake8이 실패하면 이 워크플로는 실패로 간주됨
 
       - name: Push success message
         run: echo "No syntax errors found!"  # 문법 오류가 없으면 메시지 출력
