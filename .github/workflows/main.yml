@@ -1,28 +1,32 @@
-name: Python Lint Check
+name: Python Syntax Check
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - main  # 'main' 브랜치에 푸시가 될 때마다 실행됨
 
 jobs:
-  flake8-lint:
-    runs-on: ubuntu-latest
+  check-syntax:
+    runs-on: ubuntu-latest  # Ubuntu 환경에서 실행
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2  # 코드 저장소를 체크아웃
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.8'  # Python 3.8 버전 사용
 
-      - name: Install flake8
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8
+          python -m pip install --upgrade pip  # pip 최신화
+          pip install flake8  # flake8 설치 (Python 문법 검사 도구)
 
-      - name: Run flake8
+      - name: Check Python syntax with flake8
         run: |
-          flake8 .  # 전체 디렉토리 검사
+          flake8 .  # 현재 디렉토리의 Python 파일들에 대해 flake8 실행
+        continue-on-error: false  # flake8이 실패하면 워크플로가 실패하게 설정
+
+      - name: Push success message
+        run: echo "No syntax errors found!"  # 문법 오류가 없으면 메시지 출력
