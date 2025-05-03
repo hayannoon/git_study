@@ -3,30 +3,30 @@ name: Python Syntax Check
 on:
   push:
     branches:
-      - main  # 'main' �귣ġ�� Ǫ�ð� �� ������ �����
+      - main  # 'main' 브랜치에 푸시가 될 때마다 실행됨
 
 jobs:
   check-syntax:
-    runs-on: ubuntu-latest  # Ubuntu ȯ�濡�� ����
+    runs-on: ubuntu-latest  # Ubuntu 환경에서 실행
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # �ڵ� ����Ҹ� üũ�ƿ�
+        uses: actions/checkout@v2  # 코드 저장소를 체크아웃
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'  # Python 3.8 ���� ���
+          python-version: '3.8'  # Python 3.8 버전 사용
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip  # pip �ֽ�ȭ
-          pip install flake8  # flake8 ��ġ (Python ���� �˻� ����)
+          python -m pip install --upgrade pip  # pip 최신화
+          pip install flake8  # flake8 설치 (Python 문법 검사 도구)
 
       - name: Check Python syntax with flake8
         run: |
-          flake8 .  # ���� ���丮�� Python ���ϵ鿡 ���� flake8 ����
+          flake8 .  # 현재 디렉토리의 Python 파일들에 대해 flake8 실행
+        continue-on-error: false  # 만약 flake8이 실패하면 이 워크플로는 실패로 간주됨
 
       - name: Push success message
-        run: echo "No syntax errors found!"  # ���� ������ ������ �޽��� ���
-
+        run: echo "No syntax errors found!"  # 문법 오류가 없으면 메시지 출력
