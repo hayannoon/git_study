@@ -5,7 +5,7 @@ int main() {
     std::cin >> n;
     int a[n];
     for (int i = 0; i < n; i++) {
-        std::cin >> a[i]
+        std::cin >> a[i];
     }
     int ans = 0;
     for (int i = 0; i < n; i++) {
