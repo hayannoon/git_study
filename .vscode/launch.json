@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/hayannoon/workingdir/study/git_study/test",
+      "program": "/Users/hayannoon/workingdir/study/git_study/test/build/Debug/outDebug"
+    }
+  ]
+}
