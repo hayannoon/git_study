@@ -1,0 +1,10 @@
+# 결과 파일
+result
+result.json
+
+# VSCode 설정 폴더
+.vscode/
+
+# Python 캐시
+__pycache__/
+*.pyc

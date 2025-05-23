@@ -29,10 +29,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies (clang, openjdk)
+    - name: Install dependencies (clang, openjdk, kotlin)
       run: |
         sudo apt update
-        sudo apt install -y clang openjdk-17-jdk
+        sudo apt install -y clang openjdk-17-jdk kotlin
 
     - name: Run syntax format checker
       run: |
