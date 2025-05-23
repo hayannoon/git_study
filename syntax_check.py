@@ -39,6 +39,18 @@ def check_cpp_syntax(file_path):
     except Exception as e:
         return False, str(e)
 
+def check_c_syntax(file_path):
+    try:
+        result = subprocess.run(["clang", "-fsyntax-only", file_path],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True)
+        if result.returncode == 0:
+            return True, None
+        return False, result.stderr.strip()
+    except Exception as e:
+        return False, str(e)
+
 def check_java_syntax(file_path):
     try:
         result = subprocess.run(["javac", "-Xlint", "-d", "/tmp", file_path],
@@ -84,6 +96,9 @@ def check_files_in_directory(directory):
             elif ext == ".cpp":
                 valid, msg = check_cpp_syntax(file_path)
                 file_type = "C++"
+            elif ext == ".c":
+                valid, msg = check_c_syntax(file_path)
+                file_type = "C"
             elif ext == ".java":
                 valid, msg = check_java_syntax(file_path)
                 file_type = "Java"
