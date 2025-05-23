@@ -122,7 +122,7 @@ def summarize_and_print_results(results, print_status=True):
     errors = [r for r in results if not r["valid"]]
     valid_count = total - len(errors)
 
-    status = "fail" if errors else "pass"
+    status = "SYNTAX CHECK FAIL" if errors else "SYNTAX CHECK PASS"
     if print_status:
         print(status)
 
@@ -132,7 +132,7 @@ def summarize_and_print_results(results, print_status=True):
     print(f"문법 오류 파일 수  : {len(errors)}")
 
     if total > 0:
-        print("\n📊 형식별 요약:")
+        print("\n====================== 파일별 요약======================")
         type_counts = {}
         for r in results:
             t = r["type"]
