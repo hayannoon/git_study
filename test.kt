@@ -8,7 +8,7 @@ fun main() {
     val doubled = numbers.map { it * 2 }
     println("Doubled numbers: $doubled")
 
-    greet("Kotlin")
+    greet("Kotlin").
 }
 
 data class User(val name: String, val age: Int)
