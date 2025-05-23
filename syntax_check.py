@@ -102,10 +102,14 @@ def check_files_in_directory(directory):
 
     return results
 
-def summarize_and_print_results(results):
+def summarize_and_print_results(results, print_status=True):
     total = len(results)
     errors = [r for r in results if not r["valid"]]
     valid_count = total - len(errors)
+
+    status = "fail" if errors else "pass"
+    if print_status:
+        print(status)
 
     print("\n====================== 검사 결과 요약 ======================")
     print(f"총 검사 파일 수    : {total}")
@@ -127,42 +131,42 @@ def summarize_and_print_results(results):
             print(f" - {t:<6}: 총 {stats['total']}개 중 오류 {stats['errors']}개")
 
     if errors:
-        print("\n🔴 Syntax Error details:")
+        print("\n====================== Syntax Error details ======================")
         for r in errors:
             print("------------------------------------------------------")
-            print(f"파일명    : {r['file']}")
-            print(f"파일 형식 : {r['type']}")
-            print(f"오류 내용 : {r['message']}")
+            print(f"file name    : {r['file']}")
+            print(f"file format : {r['type']}")
+            print(f"error message : {r['message']}")
     print("==========================================================\n")
 
 if __name__ == "__main__":
     import sys
+    import io
+    import contextlib
+
     if len(sys.argv) != 2:
         print("사용법: python syntax_check.py <디렉토리 경로>")
         sys.exit(1)
 
     path_to_check = sys.argv[1]
     result_data = check_files_in_directory(path_to_check)
-    summarize_and_print_results(result_data)
 
-    # 결과를 result.json 파일로 저장
-    # 결과를 result 파일로 저장
-    has_error = any(not r["valid"] for r in result_data)
-    status = "fail" if has_error else "pass"
-
-    # summarize_and_print_results의 출력을 문자열로 저장
-    import io
-    import contextlib
-
+    # result 파일로 저장 (pass/fail + 요약)
     summary_output = io.StringIO()
     with contextlib.redirect_stdout(summary_output):
-        summarize_and_print_results(result_data)
+        summarize_and_print_results(result_data, print_status=False)
     summary_text = summary_output.getvalue()
+
+    has_error = any(not r["valid"] for r in result_data)
+    status = "fail" if has_error else "pass"
 
     with open("result", "w", encoding="utf-8") as f:
         f.write(f"{status}\n")
         f.write(summary_text)
-        
+
+    # 콘솔에도 출력 (pass/fail 포함)
+    summarize_and_print_results(result_data, print_status=True)
+
     # GitHub Actions에서 실패 처리하도록 오류가 있으면 exit(1)
-    if any(not r["valid"] for r in result_data):
+    if has_error:
         sys.exit(1)
