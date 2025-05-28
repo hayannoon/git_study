@@ -9,7 +9,6 @@ LOG_FILE = "syntax_check_result.log"
 errors = []
 log_lines = []
 
-# 검사할 확장자만 허용
 SUPPORTED_EXTENSIONS = {".py", ".json", ".xml", ".c", ".cpp", ".cc", ".cxx", ".java"}
 
 def log(msg, is_error=False):
@@ -41,13 +40,14 @@ def check_xml(path):
 
 def check_cpp(path):
     result = subprocess.run(
-        ["cppcheck", "--enable=syntax", "--quiet", str(path)],
+        ["cppcheck", "--enable=syntax", str(path)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    if result.returncode != 0 or "syntax error" in result.stderr.lower():
-        log(f"❌ CPP SYNTAX ERROR in {path}:\n{result.stderr.strip()}", is_error=True)
+    combined_output = (result.stdout + result.stderr).strip()
+    if result.returncode != 0 or "error" in combined_output.lower() or "syntax" in combined_output.lower():
+        log(f"❌ CPP SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
         log(f"✅ CPP OK: {path}")
 
@@ -59,7 +59,7 @@ def check_java(path):
 
     syntax_error_found = False
     for line in result.stdout.splitlines():
-        if "Syntax error" in line:
+        if "syntax error" in line.lower():
             log(f"❌ JAVA SYNTAX ERROR in {path}:\n{line.strip()}", is_error=True)
             syntax_error_found = True
             break
@@ -67,15 +67,12 @@ def check_java(path):
         log(f"✅ JAVA OK: {path}")
 
 def main():
-    files_checked = 0
-
     for file in Path(".").rglob("*"):
         if not file.is_file():
             continue
         if file.suffix not in SUPPORTED_EXTENSIONS:
             continue
 
-        files_checked += 1
         suffix = file.suffix
 
         if suffix == ".py":
@@ -89,14 +86,11 @@ def main():
         elif suffix == ".java":
             check_java(file)
 
-    # 결과 헤더 추가
+    # 로그 파일 저장
     header = "PASS" if not errors else "FAIL"
     log_lines.insert(0, header)
-
-    # 로그 파일 저장
     Path(LOG_FILE).write_text("\n".join(log_lines), encoding="utf-8")
 
-    # CI 결과
     if errors:
         print(f"\n❌ Syntax errors found. See {LOG_FILE} for details.")
         exit(1)
