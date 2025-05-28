@@ -8,7 +8,7 @@ int main() {
         std::cin >> a[i];
     }
     int ans = 0;
-    for (int i = 0; i < n; i++ {
+    for (int i = 0; i < n; i++) {
         ans ^= a[i];
     }
     std::cout << ans << std::endl;

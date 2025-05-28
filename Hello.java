@@ -1,6 +1,6 @@
 public class Hello {
     public void sayHello() {
-        in a = 5;
-        System.out.println("Hello");
+        int a = 5;
+        System.out.println("Hello")
     }
 }
