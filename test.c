@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
-#include "minu.h";
+#include "minu.h"
+#include <Test/test1.h>
 
 typedef struct {
     char name[32];
     int age;
-} User
+} User;
 
 void greet(const char* name) {
     printf("Welcome, %s!\n", name)
