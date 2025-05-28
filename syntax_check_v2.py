@@ -60,17 +60,33 @@ def check_cpp(path):
 
 def check_java(path):
     result = subprocess.run([
-        "pmd/bin/run.sh", "check", "-d", str(path),
-        "-f", "text", "-R", "rulesets/java/quickstart.xml"
+        "pmd/bin/run.sh", "check",
+        "-d", str(path),
+        "-f", "text",
+        "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     combined_output = (result.stdout + result.stderr).strip()
     lower_output = combined_output.lower()
 
-    if "syntax error" in lower_output or "parseexception" in lower_output:
+    error_keywords = [
+        "syntax error",
+        "parse error",
+        "parseexception",
+        "expecting",
+        "error while parsing",
+        "encountered",
+        "unexpected token"
+    ]
+
+    # 키워드 하나라도 포함되면 오류 처리
+    if any(keyword in lower_output for keyword in error_keywords):
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
-    else:
+    elif "no problems found" in lower_output or "done" in lower_output:
         log(f"✅ JAVA OK: {path}")
+    else:
+        # 예외는 없지만 출력이 이상하면 수동 확인용 메시지
+        log(f"⚠️ JAVA UNSURE for {path}:\n{combined_output}")
 
 def main():
     for file in Path(".").rglob("*"):
