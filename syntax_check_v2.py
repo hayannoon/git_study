@@ -60,7 +60,7 @@ def check_cpp(path):
 
 def check_java(path):
     result = subprocess.run([
-        "pmd/bin/run.sh", "check",
+        "pmd", "check",
         "-d", str(path),
         "-f", "text",
         "-R", "rulesets/java/quickstart.xml"
