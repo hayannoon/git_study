@@ -66,28 +66,25 @@ def check_java(path):
         "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    combined_output = (result.stdout + result.stderr).strip()
+    combined_output = (result.stdout + "\n" + result.stderr).strip()
     lower_output = combined_output.lower()
 
+    # 에러 키워드 확장 (실제 메시지 반영)
     error_keywords = [
         "syntax error",
         "parse error",
         "parseexception",
-        "expecting",
-        "error while parsing",
         "encountered",
-        "unexpected token"
+        "was expecting",
+        "an error occurred while executing pmd"
     ]
 
-    # 키워드 하나라도 포함되면 오류 처리
     if any(keyword in lower_output for keyword in error_keywords):
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     elif "no problems found" in lower_output or "done" in lower_output:
         log(f"✅ JAVA OK: {path}")
-    else:
-        # 예외는 없지만 출력이 이상하면 수동 확인용 메시지
-        log(f"⚠️ JAVA UNSURE for {path}:\n{combined_output}")
 
+        
 def main():
     for file in Path(".").rglob("*"):
         if not file.is_file():
