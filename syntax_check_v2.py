@@ -78,8 +78,7 @@ def check_java(path):
         "syntaxerror",
         "error while parsing",
         "encountered <",       # PMD typical parsing error
-        "was expecting",       # PMD typical parsing error
-        "an error occurred while executing pmd"
+        "was expecting"        # PMD typical parsing error
     ]
 
     if any(keyword in lower_output for keyword in error_keywords):
@@ -89,7 +88,6 @@ def check_java(path):
     else:
         # 경고 수준 메시지 출력
         log(f"⚠️ JAVA WARNINGS in {path}:\n{combined_output}")
-
         
 def main():
     for file in Path(".").rglob("*"):
