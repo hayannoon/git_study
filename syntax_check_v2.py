@@ -9,6 +9,7 @@ LOG_FILE = "syntax_check_result.log"
 errors = []
 log_lines = []
 
+# 검사할 확장자만 허용
 SUPPORTED_EXTENSIONS = {".py", ".json", ".xml", ".c", ".cpp", ".cc", ".cxx", ".java"}
 
 def log(msg, is_error=False):
@@ -22,27 +23,31 @@ def check_python(path):
         ast.parse(Path(path).read_text(encoding="utf-8"))
         log(f"✅ PYTHON OK: {path}")
     except SyntaxError as e:
-        log(f"❌ PYTHON ERROR: {path}\n   {e}", is_error=True)
+        log(f"❌ PYTHON ERROR in {path}:\n   {e}", is_error=True)
 
 def check_json(path):
     try:
         json.loads(Path(path).read_text(encoding="utf-8"))
         log(f"✅ JSON OK: {path}")
     except json.JSONDecodeError as e:
-        log(f"❌ JSON ERROR: {path}\n   {e}", is_error=True)
+        log(f"❌ JSON ERROR in {path}:\n   {e}", is_error=True)
 
 def check_xml(path):
     try:
         ET.parse(path)
         log(f"✅ XML OK: {path}")
     except ET.ParseError as e:
-        log(f"❌ XML ERROR: {path}\n   {e}", is_error=True)
+        log(f"❌ XML ERROR in {path}:\n   {e}", is_error=True)
 
 def check_cpp(path):
-    result = subprocess.run(["cppcheck", "--enable=syntax", "--quiet", str(path)],
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(
+        ["cppcheck", "--enable=syntax", "--quiet", str(path)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
     if result.returncode != 0 or "syntax error" in result.stderr.lower():
-        log(f"❌ CPP SYNTAX ERROR: {path}\n{result.stderr}", is_error=True)
+        log(f"❌ CPP SYNTAX ERROR in {path}:\n{result.stderr.strip()}", is_error=True)
     else:
         log(f"✅ CPP OK: {path}")
 
@@ -55,7 +60,7 @@ def check_java(path):
     syntax_error_found = False
     for line in result.stdout.splitlines():
         if "Syntax error" in line:
-            log(f"❌ JAVA SYNTAX ERROR: {path}\n{line}", is_error=True)
+            log(f"❌ JAVA SYNTAX ERROR in {path}:\n{line.strip()}", is_error=True)
             syntax_error_found = True
             break
     if not syntax_error_found:
@@ -65,7 +70,9 @@ def main():
     files_checked = 0
 
     for file in Path(".").rglob("*"):
-        if not file.is_file() or file.suffix not in SUPPORTED_EXTENSIONS:
+        if not file.is_file():
+            continue
+        if file.suffix not in SUPPORTED_EXTENSIONS:
             continue
 
         files_checked += 1
@@ -82,13 +89,14 @@ def main():
         elif suffix == ".java":
             check_java(file)
 
-    # 헤더 삽입
+    # 결과 헤더 추가
     header = "PASS" if not errors else "FAIL"
     log_lines.insert(0, header)
 
     # 로그 파일 저장
     Path(LOG_FILE).write_text("\n".join(log_lines), encoding="utf-8")
 
+    # CI 결과
     if errors:
         print(f"\n❌ Syntax errors found. See {LOG_FILE} for details.")
         exit(1)
