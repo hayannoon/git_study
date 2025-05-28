@@ -50,6 +50,7 @@ def check_cpp(path):
 
     if (
         result.returncode != 0 or
+        "syntax error" in lower_output or
         "error:" in lower_output or
         "syntaxerror" in lower_output or
         "parseerror" in lower_output
