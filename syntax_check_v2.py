@@ -51,8 +51,8 @@ def check_cpp(path):
     if (
         result.returncode != 0 or
         "error:" in lower_output or
-        "syntax error" in lower_output or
-        "parse error" in lower_output
+        "syntaxerror" in lower_output or
+        "parseerror" in lower_output
     ):
         log(f"❌ CPP SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
@@ -67,7 +67,7 @@ def check_java(path):
     combined_output = (result.stdout + result.stderr).strip()
     lower_output = combined_output.lower()
 
-    if "syntax error" in lower_output or "parse error" in lower_output:
+    if "syntax error" in lower_output or "parseexception" in lower_output:
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
         log(f"✅ JAVA OK: {path}")
