@@ -69,8 +69,7 @@ jobs:
       run: python syntax_check_v2.py
 
     - name: Upload syntax check log
-      if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: syntax-check-log
         path: syntax_check_result.log
