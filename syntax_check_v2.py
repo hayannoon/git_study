@@ -59,23 +59,26 @@ def check_cpp(path):
         log(f"✅ CPP OK: {path}")
 
 def check_java(path):
+    output_file = Path("pmd-java-output.txt")
+    
     result = subprocess.run([
-        "pmd", "check",
+        "pmd/bin/run.sh", "pmd",
         "-d", str(path),
         "-f", "text",
         "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     combined_output = (result.stdout + "\n" + result.stderr).strip()
+    output_file.write_text(combined_output, encoding="utf-8")
+
     lower_output = combined_output.lower()
 
-    # 에러 키워드 확장 (실제 메시지 반영)
     error_keywords = [
-        "syntax error",
-        "parse error",
         "parseexception",
-        "encountered",
-        "was expecting",
+        "syntaxerror",
+        "error while parsing",
+        "encountered <",       # PMD typical parsing error
+        "was expecting",       # PMD typical parsing error
         "an error occurred while executing pmd"
     ]
 
@@ -83,6 +86,9 @@ def check_java(path):
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     elif "no problems found" in lower_output or "done" in lower_output:
         log(f"✅ JAVA OK: {path}")
+    else:
+        # 경고 수준 메시지 출력
+        log(f"⚠️ JAVA WARNINGS in {path}:\n{combined_output}")
 
         
 def main():
