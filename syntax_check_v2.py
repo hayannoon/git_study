@@ -40,7 +40,7 @@ def check_xml(path):
 
 def check_cpp(path):
     result = subprocess.run(
-        ["cppcheck", "--enable=syntax", str(path)],
+        ["cppcheck", "--force", "--template=gcc", str(path)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
