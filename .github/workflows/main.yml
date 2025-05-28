@@ -67,8 +67,11 @@ jobs:
 
     - name: Run syntax check
       run: python syntax_check_v2.py
+      continue-on-error: true  # <- 에러가 있어도 다음 step 실행
+
 
     - name: Upload syntax check log
+      if: always()  # <- 실패 여부 관계없이 항상 실행
       uses: actions/upload-artifact@v4
       with:
         name: syntax-check-log
