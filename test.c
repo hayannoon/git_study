@@ -8,7 +8,7 @@ typedef struct {
 } User;
 
 void greet(const char* name) {
-    printf("Welcome, %s!\n", name);
+    printf("Welcome, %s!\n", name)
 }
 
 int main() {
