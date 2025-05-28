@@ -1,4 +1,3 @@
-import os
 import subprocess
 import ast
 import json
@@ -51,8 +50,8 @@ def check_cpp(path):
     if (
         result.returncode != 0 or
         "error:" in lower_output or
-        "syntaxerror" in lower_output or
-        "parseerror" in lower_output
+        "syntax error" in lower_output or
+        "parse error" in lower_output
     ):
         log(f"❌ CPP SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
@@ -60,14 +59,19 @@ def check_cpp(path):
 
 def check_java(path):
     result = subprocess.run([
-        "pmd/bin/run.sh", "check", "-d", str(path),
-        "-f", "text", "-R", "rulesets/java/quickstart.xml"
+        "pmd/bin/run.sh", "check",
+        "-d", str(path),
+        "-f", "text",
+        "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     combined_output = (result.stdout + result.stderr).strip()
     lower_output = combined_output.lower()
 
-    if "syntax error" in lower_output or "parseexception" in lower_output:
+    # 더욱 강력하게: "syntax error", "parse error", "parseexception", "expecting"
+    error_indicators = ["syntax error", "parse error", "parseexception", "expecting", "error while parsing"]
+
+    if any(keyword in lower_output for keyword in error_indicators):
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
         log(f"✅ JAVA OK: {path}")
