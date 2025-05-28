@@ -46,7 +46,14 @@ def check_cpp(path):
         text=True
     )
     combined_output = (result.stdout + result.stderr).strip()
-    if result.returncode != 0 or "error" in combined_output.lower() or "syntax" in combined_output.lower():
+    lower_output = combined_output.lower()
+
+    if (
+        result.returncode != 0 or
+        "error:" in lower_output or
+        "syntax error" in lower_output or
+        "parse error" in lower_output
+    ):
         log(f"❌ CPP SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
     else:
         log(f"✅ CPP OK: {path}")
@@ -57,13 +64,12 @@ def check_java(path):
         "-f", "text", "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    syntax_error_found = False
-    for line in result.stdout.splitlines():
-        if "syntax error" in line.lower():
-            log(f"❌ JAVA SYNTAX ERROR in {path}:\n{line.strip()}", is_error=True)
-            syntax_error_found = True
-            break
-    if not syntax_error_found:
+    combined_output = (result.stdout + result.stderr).strip()
+    lower_output = combined_output.lower()
+
+    if "syntax error" in lower_output or "parse error" in lower_output:
+        log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
+    else:
         log(f"✅ JAVA OK: {path}")
 
 def main():
