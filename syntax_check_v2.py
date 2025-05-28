@@ -60,36 +60,66 @@ def check_cpp(path):
     else:
         log(f"✅ CPP OK: {path}")
 
-def check_java(path):
-    output_file = Path("pmd-java-output.txt")
+# def check_java(path):
+#     output_file = Path("pmd-java-output.txt")
     
+#     result = subprocess.run([
+#         "pmd/bin/run.sh", "pmd",
+#         "-d", str(path),
+#         "-f", "text",
+#         "-R", "rulesets/java/quickstart.xml"
+#     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+#     combined_output = (result.stdout + "\n" + result.stderr).strip()
+#     output_file.write_text(combined_output, encoding="utf-8")
+
+#     lower_output = combined_output.lower()
+
+#     error_keywords = [
+#         "parseexception",
+#         "syntaxerror",
+#         "error while parsing",
+#         "encountered <",       # PMD typical parsing error
+#         "was expecting"        # PMD typical parsing error
+#     ]
+
+#     if any(keyword in lower_output for keyword in error_keywords):
+#         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
+#     elif "no problems found" in lower_output or "done" in lower_output:
+#         log(f"✅ JAVA OK: {path}")
+#     else:
+#         # 경고 수준 메시지 출력
+#         log(f"⚠️ JAVA WARNINGS in {path}:\n{combined_output}")
+def check_java(path):
     result = subprocess.run([
-        "pmd/bin/run.sh", "pmd",
+        "pmd/bin/run.sh", "check",
         "-d", str(path),
         "-f", "text",
         "-R", "rulesets/java/quickstart.xml"
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    combined_output = (result.stdout + "\n" + result.stderr).strip()
-    output_file.write_text(combined_output, encoding="utf-8")
-
-    lower_output = combined_output.lower()
+    stdout = result.stdout.strip()
+    stderr = result.stderr.strip()
+    combined_output = f"{stdout}\n{stderr}".strip()
 
     error_keywords = [
+        "syntax error",
+        "parse error",
         "parseexception",
-        "syntaxerror",
+        "encountered",
+        "was expecting",
         "error while parsing",
-        "encountered <",       # PMD typical parsing error
-        "was expecting"        # PMD typical parsing error
+        "an error occurred while executing pmd",
+        "pmdexception"
     ]
 
-    if any(keyword in lower_output for keyword in error_keywords):
+    if any(keyword in combined_output.lower() for keyword in error_keywords):
+        # 로그에는 원본 출력 전체 포함
         log(f"❌ JAVA SYNTAX ERROR in {path}:\n{combined_output}", is_error=True)
-    elif "no problems found" in lower_output or "done" in lower_output:
+    elif "no problems found" in combined_output.lower() or "done" in combined_output.lower():
         log(f"✅ JAVA OK: {path}")
     else:
-        # 경고 수준 메시지 출력
-        log(f"⚠️ JAVA WARNINGS in {path}:\n{combined_output}")
+        log(f"⚠️ JAVA UNSURE for {path}:\n{combined_output}")
         
 def main():
     for file in Path(".").rglob("*"):
