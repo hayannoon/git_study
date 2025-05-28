@@ -26,6 +26,8 @@ int main() {
     printf("\n");
 
     greet("C");
+    greet("C");
+    greet("C");
 
     return 0;
 }

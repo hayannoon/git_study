@@ -1,39 +1,76 @@
-name: Syntax Format Check
+# name: Syntax Format Check
+
+# on:
+#   push:
+#     paths:
+#       - '**.py'
+#       - '**.cpp'
+#       - '**.java'
+#       - '**.json'
+#       - '**.xml'
+#   pull_request:
+#     paths:
+#       - '**.py'
+#       - '**.cpp'
+#       - '**.java'
+#       - '**.json'
+#       - '**.xml'
+
+# jobs:
+#   syntax-check:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v5
+#       with:
+#         python-version: '3.11'
+
+#     - name: Install dependencies (clang, openjdk, kotlin)
+#       run: |
+#         sudo apt update
+#         sudo apt install -y clang openjdk-17-jdk kotlin
+
+#     - name: Run syntax format checker
+#       run: |
+#         python syntax_check.py . || exit 1
+
+name: Syntax Check
 
 on:
   push:
-    paths:
-      - '**.py'
-      - '**.cpp'
-      - '**.java'
-      - '**.json'
-      - '**.xml'
   pull_request:
-    paths:
-      - '**.py'
-      - '**.cpp'
-      - '**.java'
-      - '**.json'
-      - '**.xml'
 
 jobs:
   syntax-check:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
-    - name: Install dependencies (clang, openjdk, kotlin)
+    - name: Install PMD and cppcheck
       run: |
-        sudo apt update
-        sudo apt install -y clang openjdk-17-jdk kotlin
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+        wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.55.0/pmd-bin-6.55.0.zip
+        unzip pmd-bin-6.55.0.zip
+        mv pmd-bin-6.55.0 pmd
 
-    - name: Run syntax format checker
-      run: |
-        python syntax_check.py . || exit 1
+    - name: Run syntax check
+      run: python syntax_check_v2.py
+
+    - name: Upload syntax check log
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: syntax-check-log
+        path: syntax_check_result.log
