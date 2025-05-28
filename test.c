@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "minu.h";
 
 typedef struct {
     char name[32];
